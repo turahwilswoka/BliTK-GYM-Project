@@ -94,7 +94,9 @@ RUN cp .env.example .env
 RUN composer run-script post-autoload-dump --no-interaction 2>/dev/null || true
 
 # Create required storage directories and set permissions
-RUN mkdir -p storage/framework/{sessions,views,cache,testing} \
+RUN mkdir -p storage/framework/sessions \
+    && mkdir -p storage/framework/views \
+    && mkdir -p storage/framework/cache/data \
     && mkdir -p storage/logs \
     && mkdir -p bootstrap/cache \
     && chown -R www-data:www-data /var/www/html \
