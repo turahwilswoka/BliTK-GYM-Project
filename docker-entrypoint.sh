@@ -28,7 +28,6 @@ write_env_var() {
 
 write_env_var "APP_ENV"          "$APP_ENV"
 write_env_var "APP_DEBUG"        "$APP_DEBUG"
-write_env_var "APP_URL"          "$APP_URL"
 write_env_var "DB_CONNECTION"    "$DB_CONNECTION"
 write_env_var "DB_HOST"          "$DB_HOST"
 write_env_var "DB_PORT"          "$DB_PORT"
@@ -38,6 +37,15 @@ write_env_var "DB_PASSWORD"      "$DB_PASSWORD"
 write_env_var "SESSION_DRIVER"   "$SESSION_DRIVER"
 write_env_var "CACHE_STORE"      "$CACHE_STORE"
 write_env_var "QUEUE_CONNECTION" "$QUEUE_CONNECTION"
+
+# Force APP_URL to use https:// (Railway always serves over HTTPS)
+if [ -n "$APP_URL" ]; then
+    HTTPS_URL=$(echo "$APP_URL" | sed 's|^http://|https://|')
+    write_env_var "APP_URL" "$HTTPS_URL"
+elif grep -q "^APP_URL=" /var/www/html/.env; then
+    # Fix any http:// in existing .env
+    sed -i 's|^APP_URL=http://|APP_URL=https://|' /var/www/html/.env
+fi
 
 # ----------------------------------------------------------------
 # 3. Handle APP_KEY

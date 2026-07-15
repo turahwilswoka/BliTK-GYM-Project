@@ -7,6 +7,10 @@
 	root * /var/www/html/public
 	encode zstd br gzip
 
+	# Forward the HTTPS scheme header so Laravel knows the request came
+	# through Railway's HTTPS proxy — prevents "insecure form" warnings.
+	header_up X-Forwarded-Proto https
+
 	php_server {
 		resolve_root_symlink
 	}

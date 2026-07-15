@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Trust all proxies so Railway's HTTPS load balancer is recognised.
+        // This makes Laravel generate https:// URLs for forms, redirects, etc.
+        // and eliminates the browser "insecure form submission" warning.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
