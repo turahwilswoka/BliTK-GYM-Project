@@ -85,14 +85,19 @@ COPY --from=composer_build /app/vendor vendor/
 # Copy compiled frontend assets from node stage
 COPY --from=node_build /app/public/build public/build/
 
+# Create .env from .env.example so artisan commands work.
+# Railway injects the real values (APP_KEY, DB_*, etc.) as env vars at runtime,
+# which Laravel reads automatically — overriding anything in this file.
+RUN cp .env.example .env
+
 # Run composer scripts now that the full app is present
 RUN composer run-script post-autoload-dump --no-interaction 2>/dev/null || true
 
-# Set correct ownership and permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && mkdir -p storage/framework/{sessions,views,cache,testing} \
+# Create required storage directories and set permissions
+RUN mkdir -p storage/framework/{sessions,views,cache,testing} \
     && mkdir -p storage/logs \
     && mkdir -p bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache
 
 # Copy & enable entrypoint
