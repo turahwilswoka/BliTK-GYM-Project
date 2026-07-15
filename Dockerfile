@@ -27,13 +27,16 @@ WORKDIR /app
 
 COPY composer.json composer.lock ./
 
-# Install without scripts (artisan not yet available)
+# Install without scripts (artisan not yet available).
+# --ignore-platform-reqs: composer:2 image lacks ext-gd; it IS installed in
+# the final FrankenPHP stage so this is safe to skip here.
 RUN composer install \
     --optimize-autoloader \
     --no-interaction \
     --no-scripts \
     --no-dev \
-    --prefer-dist
+    --prefer-dist \
+    --ignore-platform-reqs
 
 
 # ============================================================
