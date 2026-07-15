@@ -125,6 +125,15 @@ Route::get('/test-mail', function () {
                 'encryption' => $smtpConfig['encryption'] ?? null,
                 'from_address' => config('mail.from.address'),
                 'from_name' => config('mail.from.name'),
+            ],
+            'raw_env' => [
+                'MAIL_MAILER' => env('MAIL_MAILER'),
+                'MAIL_HOST' => env('MAIL_HOST'),
+                'MAIL_PORT' => env('MAIL_PORT'),
+                'MAIL_USERNAME' => env('MAIL_USERNAME'),
+                'MAIL_ENCRYPTION' => env('MAIL_ENCRYPTION'),
+                'MAIL_SCHEME' => env('MAIL_SCHEME'),
+                'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS'),
             ]
         ]);
     } catch (\Exception $e) {
@@ -137,6 +146,15 @@ Route::get('/test-mail', function () {
                 'port' => config('mail.mailers.' . config('mail.default') . '.port'),
                 'username' => config('mail.mailers.' . config('mail.default') . '.username'),
                 'from' => config('mail.from.address'),
+            ],
+            'raw_env' => [
+                'MAIL_MAILER' => env('MAIL_MAILER'),
+                'MAIL_HOST' => env('MAIL_HOST'),
+                'MAIL_PORT' => env('MAIL_PORT'),
+                'MAIL_USERNAME' => env('MAIL_USERNAME'),
+                'MAIL_ENCRYPTION' => env('MAIL_ENCRYPTION'),
+                'MAIL_SCHEME' => env('MAIL_SCHEME'),
+                'MAIL_FROM_ADDRESS' => env('MAIL_FROM_ADDRESS'),
             ]
         ], 500);
     }
