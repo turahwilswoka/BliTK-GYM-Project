@@ -90,17 +90,22 @@ COPY --from=node_build /app/public/build public/build/
 # which Laravel reads automatically — overriding anything in this file.
 RUN cp .env.example .env
 
+# Create a fresh empty SQLite database file.
+# (The local database.sqlite is excluded via .dockerignore to avoid stale schemas.)
+RUN touch database/database.sqlite
+
 # Run composer scripts now that the full app is present
 RUN composer run-script post-autoload-dump --no-interaction 2>/dev/null || true
 
-# Create required storage directories and set permissions
+# Create required storage directories and set correct ownership/permissions
 RUN mkdir -p storage/framework/sessions \
     && mkdir -p storage/framework/views \
     && mkdir -p storage/framework/cache/data \
     && mkdir -p storage/logs \
     && mkdir -p bootstrap/cache \
     && chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache \
+    && chmod 664 database/database.sqlite
 
 # Copy & enable entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

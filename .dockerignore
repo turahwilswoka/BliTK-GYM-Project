@@ -5,6 +5,8 @@
 node_modules
 npm-debug.log*
 vendor
+# Exclude local SQLite — container always starts fresh and runs migrations
+database/database.sqlite
 storage/framework/cache
 storage/framework/sessions
 storage/framework/views

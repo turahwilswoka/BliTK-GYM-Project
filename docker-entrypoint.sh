@@ -70,6 +70,19 @@ php artisan cache:clear   2>/dev/null || true
 php artisan view:clear    2>/dev/null || true
 
 # ----------------------------------------------------------------
+# 5. Ensure SQLite database file exists (if using SQLite)
+# ----------------------------------------------------------------
+if [ -n "$DB_CONNECTION" ] && [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_CONNECTION" ]; then
+    DB_FILE="${DB_DATABASE:-/var/www/html/database/database.sqlite}"
+    if [ ! -f "$DB_FILE" ]; then
+        echo "==> Creating SQLite database file at $DB_FILE ..."
+        touch "$DB_FILE"
+        chmod 664 "$DB_FILE"
+        chown www-data:www-data "$DB_FILE" 2>/dev/null || true
+    fi
+fi
+
+# ----------------------------------------------------------------
 # 6. Run migrations
 # ----------------------------------------------------------------
 echo "==> Running database migrations..."
