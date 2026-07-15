@@ -32,6 +32,7 @@ write_env_var() {
 
 write_env_var "APP_ENV"          "$APP_ENV"
 write_env_var "APP_DEBUG"        "$APP_DEBUG"
+write_env_var "APP_TIMEZONE"     "${APP_TIMEZONE:-Asia/Makassar}"
 write_env_var "DB_CONNECTION"    "$DB_CONNECTION"
 write_env_var "DB_HOST"          "$DB_HOST"
 write_env_var "DB_PORT"          "$DB_PORT"
