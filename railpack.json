@@ -3,5 +3,11 @@
   "packages": {
     "php": "8.4"
   },
-  "phpExtensions": ["gd"]
+  "steps": {
+    "install-gd": {
+      "commands": [
+        "install-php-extensions gd"
+      ]
+    }
+  }
 }
