@@ -14,7 +14,8 @@ class DashboardController extends Controller
         $totalMembers = User::where('role', 'customer')->count();
         $activeMembers = MemberSubscription::where('status', 'active')
             ->where('end_date', '>=', now()->toDateString())
-            ->distinct('user_id')->count();
+            ->distinct()
+            ->count('user_id');
         $pendingPayments = MemberSubscription::where('status', 'pending')->count();
         $todayAttendance = AttendanceLog::whereDate('scanned_at', today())->count();
         $monthlyRevenue = MemberSubscription::where('status', 'active')

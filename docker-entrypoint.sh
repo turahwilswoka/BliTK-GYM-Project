@@ -12,7 +12,7 @@ if [ ! -f /var/www/html/.env ]; then
 fi
 
 # ----------------------------------------------------------------
-# 2. Write all Railway env vars into .env
+# 2. Write Railway env vars into .env
 # ----------------------------------------------------------------
 write_env_var() {
     local key="$1"
@@ -43,7 +43,7 @@ write_env_var "QUEUE_CONNECTION" "$QUEUE_CONNECTION"
 # 3. Handle APP_KEY
 # ----------------------------------------------------------------
 if [ -n "$APP_KEY" ]; then
-    echo "==> Writing APP_KEY from Railway environment..."
+    echo "==> Writing APP_KEY from environment..."
     write_env_var "APP_KEY" "$APP_KEY"
 else
     echo "==> APP_KEY not set — generating and saving to .env..."
@@ -51,18 +51,32 @@ else
 fi
 
 # ----------------------------------------------------------------
-# 4. Ensure all storage directories exist with correct permissions
+# 4. Ensure storage directories exist with correct permissions
 # ----------------------------------------------------------------
 echo "==> Preparing storage directories..."
 mkdir -p /var/www/html/storage/framework/sessions
 mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/framework/cache/data
+mkdir -p /var/www/html/storage/app/public
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # ----------------------------------------------------------------
-# 5. Clear any stale cached config
+# 5. Ensure SQLite database file exists (when using SQLite)
+# ----------------------------------------------------------------
+DB_CONN="${DB_CONNECTION:-sqlite}"
+if [ "$DB_CONN" = "sqlite" ]; then
+    DB_FILE="${DB_DATABASE:-/var/www/html/database/database.sqlite}"
+    if [ ! -f "$DB_FILE" ]; then
+        echo "==> Creating SQLite database file at $DB_FILE ..."
+        touch "$DB_FILE"
+    fi
+    chmod 664 "$DB_FILE"
+fi
+
+# ----------------------------------------------------------------
+# 6. Clear stale caches before reconfiguring
 # ----------------------------------------------------------------
 echo "==> Clearing stale caches..."
 php artisan config:clear  2>/dev/null || true
@@ -70,27 +84,20 @@ php artisan cache:clear   2>/dev/null || true
 php artisan view:clear    2>/dev/null || true
 
 # ----------------------------------------------------------------
-# 5. Ensure SQLite database file exists (if using SQLite)
-# ----------------------------------------------------------------
-if [ -n "$DB_CONNECTION" ] && [ "$DB_CONNECTION" = "sqlite" ] || [ -z "$DB_CONNECTION" ]; then
-    DB_FILE="${DB_DATABASE:-/var/www/html/database/database.sqlite}"
-    if [ ! -f "$DB_FILE" ]; then
-        echo "==> Creating SQLite database file at $DB_FILE ..."
-        touch "$DB_FILE"
-        chmod 664 "$DB_FILE"
-        chown www-data:www-data "$DB_FILE" 2>/dev/null || true
-    fi
-fi
-
-# ----------------------------------------------------------------
-# 6. Run migrations
+# 7. Run migrations
 # ----------------------------------------------------------------
 echo "==> Running database migrations..."
 php artisan migrate --force
 
 # ----------------------------------------------------------------
-# 7. Cache for production performance
-#    view:cache runs AFTER storage dirs are confirmed to exist
+# 8. Seed database (firstOrCreate — safe on every deploy)
+#    Creates: admin user, membership packages (Silver/Gold/Platinum)
+# ----------------------------------------------------------------
+echo "==> Seeding database..."
+php artisan db:seed --force
+
+# ----------------------------------------------------------------
+# 9. Cache for production performance
 # ----------------------------------------------------------------
 echo "==> Caching for production..."
 php artisan config:cache
@@ -99,16 +106,16 @@ php artisan route:cache
 php artisan view:cache
 
 # ----------------------------------------------------------------
-# 8. Storage symlink (ignore if already exists)
+# 10. Storage symlink
 # ----------------------------------------------------------------
 echo "==> Creating storage symlink..."
 php artisan storage:link 2>/dev/null || true
 
 # ----------------------------------------------------------------
-# 9. Package discovery
+# 11. Package discovery (was skipped with --no-scripts at build time)
 # ----------------------------------------------------------------
 echo "==> Discovering packages..."
 php artisan package:discover --ansi
 
-echo "==> All done. Starting FrankenPHP..."
+echo "==> All done! Starting FrankenPHP..."
 exec frankenphp run --config /var/www/html/Caddyfile

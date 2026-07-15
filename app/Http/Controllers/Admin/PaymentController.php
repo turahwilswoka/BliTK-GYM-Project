@@ -12,7 +12,12 @@ class PaymentController extends Controller
     public function index()
     {
         $payments = MemberSubscription::with(['user', 'membership'])
-            ->orderByRaw("FIELD(status, 'pending', 'active', 'expired', 'cancelled')")
+            ->orderByRaw("CASE status
+                WHEN 'pending'   THEN 1
+                WHEN 'active'    THEN 2
+                WHEN 'expired'   THEN 3
+                WHEN 'cancelled' THEN 4
+                ELSE 5 END")
             ->latest()
             ->paginate(15);
 
