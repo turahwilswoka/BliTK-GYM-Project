@@ -43,7 +43,11 @@ write_env_var "CACHE_STORE"      "$CACHE_STORE"
 write_env_var "QUEUE_CONNECTION" "$QUEUE_CONNECTION"
 
 # Write mail configurations
-write_env_var "MAIL_MAILER"       "$MAIL_MAILER"
+if [ -z "$MAIL_MAILER" ] && [ -n "$MAIL_HOST" ]; then
+    write_env_var "MAIL_MAILER" "smtp"
+else
+    write_env_var "MAIL_MAILER" "$MAIL_MAILER"
+fi
 write_env_var "MAIL_SCHEME"       "$MAIL_SCHEME"
 write_env_var "MAIL_HOST"         "$MAIL_HOST"
 write_env_var "MAIL_PORT"         "$MAIL_PORT"
