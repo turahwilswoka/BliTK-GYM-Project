@@ -40,6 +40,7 @@ write_env_var "QUEUE_CONNECTION" "$QUEUE_CONNECTION"
 
 # Write mail configurations
 write_env_var "MAIL_MAILER"       "$MAIL_MAILER"
+write_env_var "MAIL_SCHEME"       "$MAIL_SCHEME"
 write_env_var "MAIL_HOST"         "$MAIL_HOST"
 write_env_var "MAIL_PORT"         "$MAIL_PORT"
 write_env_var "MAIL_USERNAME"     "$MAIL_USERNAME"
