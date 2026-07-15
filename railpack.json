@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "packages": {
+    "php": "8.4"
+  },
+  "steps": {
+    "install-gd": {
+      "commands": [
+        "install-php-extensions gd"
+      ]
+    }
+  }
+}
