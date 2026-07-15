@@ -18,10 +18,14 @@ write_env_var() {
     local key="$1"
     local value="$2"
     if [ -n "$value" ]; then
+        # Strip existing leading/trailing single or double quotes
+        value=$(echo "$value" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//")
+        
+        # Write to .env wrapped in double quotes to handle spaces and special characters safely
         if grep -q "^${key}=" /var/www/html/.env; then
-            sed -i "s|^${key}=.*|${key}=${value}|" /var/www/html/.env
+            sed -i "s|^${key}=.*|${key}=\"${value}\"|" /var/www/html/.env
         else
-            echo "${key}=${value}" >> /var/www/html/.env
+            echo "${key}=\"${value}\"" >> /var/www/html/.env
         fi
     fi
 }
