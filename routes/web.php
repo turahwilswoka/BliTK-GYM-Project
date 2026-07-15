@@ -100,3 +100,44 @@ Route::middleware(['auth', \App\Http\Middleware\CheckAdminRole::class])
             Route::post('/{session}/complete',        [AdminChat::class, 'complete'])->name('complete');
         });
     });
+
+// ─── Mail Diagnostic Helper ──────────────────────────────────────────────────
+Route::get('/test-mail', function () {
+    try {
+        $mailer = config('mail.default');
+        $smtpConfig = config("mail.mailers.{$mailer}");
+        
+        $targetEmail = request('to', 'test@gmail.com');
+        
+        \Illuminate\Support\Facades\Mail::raw('Ini adalah email uji coba konfigurasi SMTP BliTK Gym.', function ($message) use ($targetEmail) {
+            $message->to($targetEmail)
+                    ->subject('Uji Coba SMTP – BliTK Gym');
+        });
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => "Email uji coba berhasil dikirim ke {$targetEmail}!",
+            'driver' => $mailer,
+            'config' => [
+                'host' => $smtpConfig['host'] ?? null,
+                'port' => $smtpConfig['port'] ?? null,
+                'username' => $smtpConfig['username'] ?? null,
+                'encryption' => $smtpConfig['encryption'] ?? null,
+                'from_address' => config('mail.from.address'),
+                'from_name' => config('mail.from.name'),
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'driver' => config('mail.default'),
+            'config_summary' => [
+                'host' => config('mail.mailers.' . config('mail.default') . '.host'),
+                'port' => config('mail.mailers.' . config('mail.default') . '.port'),
+                'username' => config('mail.mailers.' . config('mail.default') . '.username'),
+                'from' => config('mail.from.address'),
+            ]
+        ], 500);
+    }
+});
