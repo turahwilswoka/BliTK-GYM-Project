@@ -114,10 +114,10 @@ php artisan route:cache
 php artisan view:cache
 
 # ----------------------------------------------------------------
-# 10. Storage symlink
+# 10. Storage symlink (--force recreates even if already exists)
 # ----------------------------------------------------------------
 echo "==> Creating storage symlink..."
-php artisan storage:link 2>/dev/null || true
+php artisan storage:link --force 2>/dev/null || true
 
 # ----------------------------------------------------------------
 # 11. Package discovery (was skipped with --no-scripts at build time)
