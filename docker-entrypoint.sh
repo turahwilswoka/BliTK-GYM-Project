@@ -38,6 +38,16 @@ write_env_var "SESSION_DRIVER"   "$SESSION_DRIVER"
 write_env_var "CACHE_STORE"      "$CACHE_STORE"
 write_env_var "QUEUE_CONNECTION" "$QUEUE_CONNECTION"
 
+# Write mail configurations
+write_env_var "MAIL_MAILER"       "$MAIL_MAILER"
+write_env_var "MAIL_HOST"         "$MAIL_HOST"
+write_env_var "MAIL_PORT"         "$MAIL_PORT"
+write_env_var "MAIL_USERNAME"     "$MAIL_USERNAME"
+write_env_var "MAIL_PASSWORD"     "$MAIL_PASSWORD"
+write_env_var "MAIL_ENCRYPTION"   "$MAIL_ENCRYPTION"
+write_env_var "MAIL_FROM_ADDRESS" "$MAIL_FROM_ADDRESS"
+write_env_var "MAIL_FROM_NAME"    "$MAIL_FROM_NAME"
+
 # Force APP_URL to use https:// (Railway always serves over HTTPS)
 if [ -n "$APP_URL" ]; then
     HTTPS_URL=$(echo "$APP_URL" | sed 's|^http://|https://|')
